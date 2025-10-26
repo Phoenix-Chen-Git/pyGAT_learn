@@ -6,13 +6,19 @@ from layers import GraphAttentionLayer, SpGraphAttentionLayer
 
 class GAT(nn.Module):
     def __init__(self, nfeat, nhid, nclass, dropout, alpha, nheads):
+        # what's the alpha here?
+        # slope for leakyReLu when x<0
         """Dense version of GAT."""
         super(GAT, self).__init__()
         self.dropout = dropout
 
         self.attentions = [GraphAttentionLayer(nfeat, nhid, dropout=dropout, alpha=alpha, concat=True) for _ in range(nheads)]
+        # what's concat=True?
+        # we stack heads
         for i, attention in enumerate(self.attentions):
             self.add_module('attention_{}'.format(i), attention)
+        # what's this for loop?
+        # register new layers
 
         self.out_att = GraphAttentionLayer(nhid * nheads, nclass, dropout=dropout, alpha=alpha, concat=False)
 
@@ -25,6 +31,8 @@ class GAT(nn.Module):
 
 
 class SpGAT(nn.Module):
+    # what's the difference?
+    # only calculate existing edges
     def __init__(self, nfeat, nhid, nclass, dropout, alpha, nheads):
         """Sparse version of GAT."""
         super(SpGAT, self).__init__()
